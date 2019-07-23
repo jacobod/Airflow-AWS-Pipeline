@@ -6,7 +6,7 @@ from airflow.utils.decorators import apply_defaults
 
 # The parameters should be used to distinguish between JSON and CSV file.
 # Another important requirement of the stage operator is containing a templated
-#  field that allows it to load timestamped files from S3 based on the 
+#  field that allows it to load timestamped files from S3 based on the
 #  execution time and run backfills.
 
 class StageToRedshiftOperator(BaseOperator):
@@ -26,6 +26,7 @@ class StageToRedshiftOperator(BaseOperator):
     def __init__(self,
                  redshift_conn_id="",
                  aws_credentials_id="",
+                 create_sql="",
                  target_table="",
                  s3_bucket='',
                  s3_key="",
@@ -36,6 +37,7 @@ class StageToRedshiftOperator(BaseOperator):
         super(StageToRedshiftOperator, self).__init__(*args, **kwargs)
         self.redshift_conn_id = redshift_conn_id
         self.aws_credentials_id = aws_credentials_id
+        self.create_sql = create_sql
         self.target_table = target_table
         self.s3_bucket = s3_bucket
         self.s3_key = s3_key
@@ -48,13 +50,16 @@ class StageToRedshiftOperator(BaseOperator):
         # format SQL based on file type & Timestamp???
 
         # initialize the connections
-        self.log.info("Making Connections to S3 and Redshift..")
+        self.log.info("Making Connections to Redshift..")
         aws_hook = AwsHook(self.aws_credentials_id)
         credentials = aws_hook.get_credentials()
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
 
         self.log.info("Clearing out table if exists in Postgres")
-        redhisft.run("DROP {} IF EXISTS;".format(self.table))
+        redshift.run("DROP {} IF EXISTS;".format(self.table))
+
+        self.log.info("Creating table {} in Redshift".format(self.target_table))
+        redshift.run(create_sql)
 
         self.log.info('Loading the data from {} to Redshift'.format(self.s3_bucket))
         # creating vars to format with
