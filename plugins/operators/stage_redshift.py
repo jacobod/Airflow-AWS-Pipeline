@@ -64,7 +64,7 @@ class StageToRedshiftOperator(BaseOperator):
         self.log.info('Loading the data from {} to Redshift'.format(self.s3_bucket))
         # creating vars to format with
         rendered_key = self.s3_key.format(**context)
-        s3_path = "s3://{}/{}".format(self.s3_bucket, rendered_key)
+        s3_path = "s3n://{}/{}".format(self.s3_bucket, rendered_key)
         # setting the ignore headers to none if not a csv
         ignore_headers = None
         ignore_rows = None
