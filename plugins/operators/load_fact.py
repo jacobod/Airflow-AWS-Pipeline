@@ -33,7 +33,7 @@ class LoadFactOperator(BaseOperator):
         self.redshift_conn_id = redshift_conn_id
         self.target_table = origin_table
         self.sql = create_sql
-        self.create = create
+        self.create_table = create_table
 
     def execute(self, context):
         self.log.info("Making Connections to Redshift..")
@@ -43,6 +43,7 @@ class LoadFactOperator(BaseOperator):
         # create target table if setting set to True
         if self.create_table:
             self.log.info("Creating table {} in Redshift".format(self.target_table))
+            redshift.run("DROP TABLE IF EXISTS {}".format(self.target_table))
             redshift.run(create_sql)
         # moving data over from redshift
         insert_sql = SqlQueries.songplay_table_insert
