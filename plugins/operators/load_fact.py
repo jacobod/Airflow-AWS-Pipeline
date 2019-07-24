@@ -23,25 +23,27 @@ class LoadFactOperator(BaseOperator):
     """
     @apply_defaults
     def __init__(self,
-                 redshift_conn_id,
-                 target_table,
-                 create_sql,
+                 redshift_conn_id='',
+                 target_table='',
+                 sql='',
+                 create_table='',
                  *args, **kwargs):
 
         super(LoadFactOperator, self).__init__(*args, **kwargs)
         self.redshift_conn_id = redshift_conn_id
         self.target_table = origin_table
-        self.create_sql = create_sql
-        self.copy_sql = copy_sql
+        self.sql = create_sql
+        self.create = create
 
     def execute(self, context):
         self.log.info("Making Connections to Redshift..")
         aws_hook = AwsHook(self.aws_credentials_id)
         credentials = aws_hook.get_credentials()
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
-        # create target table
-        self.log.info("Creating table {} in Redshift".format(self.target_table))
-        redshift.run(create_sql)
+        # create target table if setting set to True
+        if self.create_table:
+            self.log.info("Creating table {} in Redshift".format(self.target_table))
+            redshift.run(create_sql)
         # moving data over from redshift
         insert_sql = SqlQueries.songplay_table_insert
         self.log.info("Inserting into {}".format(self.target_table))

@@ -25,10 +25,10 @@ class LoadDimensionOperator(BaseOperator):
 
     @apply_defaults
     def __init__(self,
-                 redshift_conn_id,
-                 target_table,
-                 sql,
-                 insert_mode,
+                 redshift_conn_id='',
+                 target_table='',
+                 sql='',
+                 insert_mode='delete', # or insert or anything else but delete
                  *args, **kwargs):
 
         super(LoadDimensionOperator, self).__init__(*args, **kwargs)
