@@ -11,7 +11,7 @@ AWS_SECRET = os.environ.get('AWS_SECRET')
 
 # TODO:
 # update readme
-# update operators below with parameters 
+# update operators below with parameters
 
 default_args = {
     'owner': 'udacity',
@@ -74,7 +74,8 @@ load_time_dimension_table = LoadDimensionOperator(
 run_quality_checks = DataQualityOperator(
     task_id='Run_data_quality_checks',
     dag=dag,
-    provide_context=True
+    provide_context=True,
+    retries=3
 )
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
