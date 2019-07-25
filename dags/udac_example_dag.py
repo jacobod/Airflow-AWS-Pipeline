@@ -8,7 +8,11 @@ from helpers import SqlQueries
 
 AWS_KEY = os.environ.get('AWS_KEY')
 AWS_SECRET = os.environ.get('AWS_SECRET')
+aws_credentials_id = 'aws_credentials'
 redshift_credentials_id = 'redshift'
+s3_bucket = 'udacity-dend'
+s3_logs = 'log_data'
+s3_songs = 'song_data'
 # TODO:
 # update operators below with parameters
 
@@ -35,12 +39,11 @@ stage_events_to_redshift = StageToRedshiftOperator(
     dag=dag,
     provide_contex=True,
     redshift_conn_id=redshift_credentials_id,
-    aws_credentials_id="",
-    create_sql="",
-    target_table="",
-    s3_bucket='',
-    s3_key=AWS_KEY,
-    file_format='csv',
+    aws_credentials_id=aws_credentials_id,
+    target_table="staging_events",
+    s3_bucket=s3_bucket,
+    s3_key=s3_logs,
+    file_format='csv'
 )
 
 stage_songs_to_redshift = StageToRedshiftOperator(
@@ -48,12 +51,11 @@ stage_songs_to_redshift = StageToRedshiftOperator(
     dag=dag,
     provide_context=True,
     redshift_conn_id=redshift_credentials_id,
-    aws_credentials_id="",
-    create_sql="",
-    target_table="",
-    s3_bucket='',
-    s3_key="",
-    file_format='csv',
+    aws_credentials_id=aws_credentials_id,
+    target_table="staging_songs",
+    s3_bucket=s3_bucket,
+    s3_key=s3_songs,
+    file_format='csv'
 )
 
 load_songplays_table = LoadFactOperator(
@@ -61,7 +63,7 @@ load_songplays_table = LoadFactOperator(
     dag=dag,
     redshift_conn_id=redshift_credentials_id,
     target_table='songplays',
-    sql=SqlQueries.songplay_table_insert,
+    sql=SqlQueries.songplay_table_insert
 )
 
 load_user_dimension_table = LoadDimensionOperator(
@@ -71,7 +73,7 @@ load_user_dimension_table = LoadDimensionOperator(
     redshift_conn_id=redshift_credentials_id,
     target_table='users',
     sql=SqlQueries.user_table_insert,
-    insert_mode='truncate',
+    insert_mode='truncate'
 )
 
 load_song_dimension_table = LoadDimensionOperator(
@@ -112,7 +114,7 @@ run_quality_checks = DataQualityOperator(
     redshift_conn_id=redshift_credentials_id,
     test_sql='',
     test_tbl='',
-    expcted_results=0,
+    expcted_results=0
 )
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)

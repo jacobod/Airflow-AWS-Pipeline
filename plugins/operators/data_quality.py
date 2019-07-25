@@ -31,7 +31,7 @@ class DataQualityOperator(BaseOperator):
                  redshift_conn_id='',
                  test_sql='',
                  test_tbl='',
-                 expcted_results=0,
+                 expected_results=0,
                  *args, **kwargs):
 
         super(DataQualityOperator, self).__init__(*args, **kwargs)
