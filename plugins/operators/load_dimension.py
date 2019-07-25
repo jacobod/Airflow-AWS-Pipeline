@@ -28,7 +28,7 @@ class LoadDimensionOperator(BaseOperator):
                  redshift_conn_id='',
                  target_table='',
                  sql='',
-                 insert_mode='delete', # or insert or anything else but delete
+                 insert_mode='truncate', # or insert or anything else but delete
                  *args, **kwargs):
 
         super(LoadDimensionOperator, self).__init__(*args, **kwargs)
@@ -43,22 +43,10 @@ class LoadDimensionOperator(BaseOperator):
         aws_hook = AwsHook(self.aws_credentials_id)
         credentials = aws_hook.get_credentials()
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
-        # create table if provided
-        self.log.info("Creating table {} in Redshift".format(self.target_table))
-        redshift.run(self.sql)
         # dropping table if exists already
-        if self.insert_mode == 'delete':
-            redshift.run("DROP TABLE IF EXISTS {}".format(self.target_table))
+        if self.insert_mode == 'truncate':
+            redshift.run("TRUNCATE {};".format(self.target_table))
         # create target table
         self.log.info("Inserting into table {} in Redshift".format(self.target_table))
-        # case switch to decide which data transformation to use
-        if self.target_table == 'users':
-            insert_sql = SqlQueries.user_table_insert
-        elif self.target_table == 'artists':
-            insert_sql = SqlQueries.artist_table_insert
-        elif self.target_table == 'songs':
-            insert_sql = SqlQueries.song_table_insert
-        elif self.target_table == 'timestamps':
-            insert_sql = SqlQueries.time_table_insert
         # insert data into table
-        redshift.run(upsert_sql.format(self.target_table,insert_sql))
+        redshift.run(upsert_sql.format(self.target_table,sql))
