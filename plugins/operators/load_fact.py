@@ -30,7 +30,7 @@ class LoadFactOperator(BaseOperator):
 
         super(LoadFactOperator, self).__init__(*args, **kwargs)
         self.redshift_conn_id = redshift_conn_id
-        self.target_table = origin_table
+        self.target_table = target_table
         self.sql = sql
 
     def execute(self, context):

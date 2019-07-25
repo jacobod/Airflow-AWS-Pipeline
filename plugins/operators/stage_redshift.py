@@ -26,7 +26,6 @@ class StageToRedshiftOperator(BaseOperator):
     def __init__(self,
                  redshift_conn_id="",
                  aws_credentials_id="",
-                 create_sql="",
                  target_table="",
                  s3_bucket='',
                  s3_key="",
@@ -37,7 +36,6 @@ class StageToRedshiftOperator(BaseOperator):
         super(StageToRedshiftOperator, self).__init__(*args, **kwargs)
         self.redshift_conn_id = redshift_conn_id
         self.aws_credentials_id = aws_credentials_id
-        self.create_sql = create_sql
         self.target_table = target_table
         self.s3_bucket = s3_bucket
         self.s3_key = s3_key
@@ -45,21 +43,12 @@ class StageToRedshiftOperator(BaseOperator):
         self.file_timestamp = file_timestamp
 
     def execute(self, context):
-        # TODO
-        # get all files in s3 bucket based on credentials and file format and optionally timestamp
-        # format SQL based on file type & Timestamp???
 
         # initialize the connections
         self.log.info("Making Connections to Redshift..")
         aws_hook = AwsHook(self.aws_credentials_id)
         credentials = aws_hook.get_credentials()
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
-
-        self.log.info("Clearing out table if exists in Postgres")
-        redshift.run("DROP {} IF EXISTS;".format(self.table))
-
-        self.log.info("Creating table {} in Redshift".format(self.target_table))
-        redshift.run(create_sql)
 
         self.log.info('Loading the data from {} to Redshift'.format(self.s3_bucket))
         # creating vars to format with
