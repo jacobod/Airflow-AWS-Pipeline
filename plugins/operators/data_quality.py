@@ -56,6 +56,4 @@ class DataQualityOperator(BaseOperator):
         else:
             self.log.info(
                 "Data Quality Check on {} passed with {} records".format(
-                    self.test_tbl,len(records))
-            )
-        #self.log.info('DataQualityOperator not implemented yet')
+                    self.test_tbl,len(records)))
