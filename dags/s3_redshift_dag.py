@@ -37,7 +37,7 @@ start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
     dag=dag,
-    provide_contex=True,
+    provide_context=True,
     redshift_conn_id=redshift_credentials_id,
     aws_credentials_id=aws_credentials_id,
     target_table="staging_events",
