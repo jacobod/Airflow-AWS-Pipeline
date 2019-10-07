@@ -42,13 +42,11 @@ class DataQualityOperator(BaseOperator):
 
     def execute(self, context):
         self.log.info("Making Connections to Redshift..")
-        aws_hook = AwsHook(self.aws_credentials_id)
-        credentials = aws_hook.get_credentials()
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
         # run the given sql
-        records = redshift.get_records(test_sql)
+        records = redshift.get_records(self.test_sql)
         # check if matches expected result
-        if len(records) != expected_results:
+        if len(records) != self.expected_results:
             raise ValueError(
                 """Data Quality check on {} failed with result of {} records.
                  Expected result was {} records""".format(
