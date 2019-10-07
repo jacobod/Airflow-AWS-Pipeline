@@ -50,7 +50,7 @@ class DataQualityOperator(BaseOperator):
             raise ValueError(
                 """Data Quality check on {} failed with result of {} records.
                  Expected result was {} records""".format(
-                    self.test_tbl,len(records)))
+                    self.test_tbl,len(records)),self.expected_results)
         else:
             self.log.info(
                 "Data Quality Check on {} passed with {} records".format(
